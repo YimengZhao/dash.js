@@ -609,6 +609,10 @@ MediaPlayer.dependencies.Stream = function () {
             return streamInfo;
         },
 
+	getStreamProcessors: function(){
+	    return streamProcessors;
+	},
+
         /**
          * @param type
          * @returns {Array}

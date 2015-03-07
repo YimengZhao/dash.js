@@ -4,6 +4,7 @@ MediaPlayer.rules.BufferLevelRule = function () {
     var isBufferLevelOutran = {},
         isCompleted = {},
         scheduleController = {},
+        isGreedyBufferingStart = false,
 
         getCurrentHttpRequestLatency = function(metrics) {
             var httpRequest = this.metricsExt.getCurrentHttpRequest(metrics);
@@ -13,7 +14,15 @@ MediaPlayer.rules.BufferLevelRule = function () {
             return 0;
         },
 
+    getGreedyBufferStart = function(){
+	return isGreedyBufferingStart;
+    },
+    
         decideBufferLength = function (minBufferTime, duration) {
+	    if(isGreedyBufferingStart == true){
+		return 2000;
+	    }
+
             var minBufferTarget;
 
             if (isNaN(duration) || MediaPlayer.dependencies.BufferController.DEFAULT_MIN_BUFFER_TIME < duration && minBufferTime < duration) {
@@ -28,6 +37,9 @@ MediaPlayer.rules.BufferLevelRule = function () {
         },
 
         getRequiredBufferLength = function (isDynamic, duration, scheduleController) {
+	    if(isGreedyBufferingStart == true){
+		return 2000;
+	    }
             var self = this,
                 criticalBufferLevel = scheduleController.bufferController.getCriticalBufferLevel(),
                 vmetrics = self.metricsModel.getReadOnlyMetricsFor("video"),

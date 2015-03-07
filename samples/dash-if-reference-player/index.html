@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+2<!DOCTYPE html>
 <html ng-app="DashPlayer" lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -172,6 +172,8 @@
     <!-- App -->
     <script src="app/metrics.js"></script>
     <script src="app/main.js"></script>
+
+
 </head>
 <body ng-controller="DashController">
     <div class="modal fade" id="streamModal">
@@ -240,6 +242,20 @@
                 <input type="text" class="form-control" placeholder="manifest" ng-model="selectedItem.url">
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" ng-click="doLoad()">Load</button>
+		    <button
+                                type="button"
+                                class="btn btn-default"
+		                ng-class="{active:GreedyBuffering == true}"
+                                ng-click="setGreedyBuffering(true)">
+                                <span>Greedy</span>
+                     </button>
+		    <button
+                                type="button"
+                                class="btn btn-default"
+		                ng-class="{active:GreedyBuffering == false}"
+                                ng-click="setGreedyBuffering(false)">
+                                <span>Not Greedy</span>
+                     </button>
                 </span>
             </div>
         </div>

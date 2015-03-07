@@ -39,6 +39,7 @@
             activeStream.seek(time);
         },
 
+     
         /*
          * Replaces the currently displayed <video> with a new data and corresponding <video> element.
          *
@@ -395,6 +396,10 @@
                 return item.getStreamInfo().id === id;
             })[0];
         },
+
+	getStreams: function(){
+	    return streams;
+	},
 
         initialize: function () {
             this.timeSyncController.subscribe(MediaPlayer.dependencies.TimeSyncController.eventList.ENAME_TIME_SYNCHRONIZATION_COMPLETED, this.timelineConverter);

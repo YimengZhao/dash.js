@@ -14,7 +14,10 @@ MediaPlayer.dependencies.ScheduleController = function () {
         playListMetrics = null,
         playListTraceMetrics = null,
         playListTraceMetricsClosed = true,
+        enableLongFragment = false,
 
+    
+    
         clearPlayListTraceMetrics = function (endTime, stopreason) {
             var duration = 0,
                 startTime = null;
@@ -98,7 +101,14 @@ MediaPlayer.dependencies.ScheduleController = function () {
 
             self.rulesController.applyRules(rules, self.streamProcessor, callback, fragmentsToLoad, function(currentValue, newValue) {
                 currentValue = currentValue === MediaPlayer.rules.SwitchRequest.prototype.NO_CHANGE ? 0 : currentValue;
-                return Math.max(currentValue, newValue);
+
+		if(!enableLongFragment)
+		{
+                    return Math.max(currentValue, newValue);
+		}
+		else{
+		    return 2000;
+		}
             });
         },
 
@@ -429,6 +439,10 @@ MediaPlayer.dependencies.ScheduleController = function () {
         getFragmentToLoadCount:function () {
             return fragmentsToLoad;
         },
+
+	setLongFragment:function(enabled){
+	    enableLongFragment = enabled;
+	},
 
         reset: function() {
             var self = this;

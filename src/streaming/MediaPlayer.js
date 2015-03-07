@@ -410,6 +410,16 @@ MediaPlayer = function (context) {
             abrController.setAutoSwitchBitrate(value);
         },
 
+
+	setGreedyBuffering: function(enabled){
+	    var streams = streamController.getStreams();
+	    var processors = streams[0].getStreamProcessors();
+	    for(var i = 0; i < processors.length; i++){
+		var scheduleController = processors[i].scheduleController;
+		scheduleController.setLongFragment(enabled);
+	    }
+
+	},
         /**
          * @param newRulesCollection
          * @memberof MediaPlayer#
