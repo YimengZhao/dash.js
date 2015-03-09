@@ -5,6 +5,7 @@ MediaPlayer.rules.BufferLevelRule = function () {
         isCompleted = {},
         scheduleController = {},
         isGreedyBufferingStart = false,
+    greedyBufferingLength = 0,
 
         getCurrentHttpRequestLatency = function(metrics) {
             var httpRequest = this.metricsExt.getCurrentHttpRequest(metrics);
@@ -14,15 +15,10 @@ MediaPlayer.rules.BufferLevelRule = function () {
             return 0;
         },
 
-    getGreedyBufferStart = function(){
-	return isGreedyBufferingStart;
-    },
+       
     
         decideBufferLength = function (minBufferTime, duration) {
-	    if(isGreedyBufferingStart == true){
-		return 2000;
-	    }
-
+	   
             var minBufferTarget;
 
             if (isNaN(duration) || MediaPlayer.dependencies.BufferController.DEFAULT_MIN_BUFFER_TIME < duration && minBufferTime < duration) {
@@ -37,9 +33,7 @@ MediaPlayer.rules.BufferLevelRule = function () {
         },
 
         getRequiredBufferLength = function (isDynamic, duration, scheduleController) {
-	    if(isGreedyBufferingStart == true){
-		return 2000;
-	    }
+	    
             var self = this,
                 criticalBufferLevel = scheduleController.bufferController.getCriticalBufferLevel(),
                 vmetrics = self.metricsModel.getReadOnlyMetricsFor("video"),
@@ -113,6 +107,15 @@ MediaPlayer.rules.BufferLevelRule = function () {
             scheduleController[id][scheduleControllerValue.streamProcessor.getType()] = scheduleControllerValue;
         },
 
+	/*modify by yimeng*/
+	setGreedyBufferingLength: function(value){
+	    greedyBufferingLength = value;
+	},
+
+        setGreedyBufferingStart: function(value){
+	     isGreedyBufferingStart = value;
+        },
+
         execute: function(context, callback) {
             var streamInfo = context.getStreamInfo(),
                 streamId = streamInfo.id,
@@ -134,8 +137,16 @@ MediaPlayer.rules.BufferLevelRule = function () {
                 fragmentDuration = track.fragmentDuration,
                 currentTime = scheduleCtrl.playbackController.getTime(),
                 timeToEnd = isDynamic ? Number.POSITIVE_INFINITY : duration - currentTime,
-                requiredBufferLength = Math.min(getRequiredBufferLength.call(this, isDynamic, duration, scheduleCtrl), timeToEnd),
-                remainingDuration = Math.max(requiredBufferLength - bufferedDuration, 0),
+	    requiredBufferLength = 0;
+
+	    if(isGreedyBufferingStart){
+		requiredBufferLength = greedyBufferingLength;
+	    }
+	    else{
+		requiredBufferLength  = Math.min(getRequiredBufferLength.call(this, isDynamic, duration, scheduleCtrl), timeToEnd);
+	    }
+                
+	    var remainingDuration = Math.max(requiredBufferLength - bufferedDuration, 0),
                 fragmentCount;
 
             fragmentCount = Math.ceil(remainingDuration/fragmentDuration);

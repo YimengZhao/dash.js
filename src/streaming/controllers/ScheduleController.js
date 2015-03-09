@@ -15,7 +15,7 @@ MediaPlayer.dependencies.ScheduleController = function () {
         playListTraceMetrics = null,
         playListTraceMetricsClosed = true,
         enableLongFragment = false,
-
+        pauseTime = 0,
     
     
         clearPlayListTraceMetrics = function (endTime, stopreason) {
@@ -95,22 +95,24 @@ MediaPlayer.dependencies.ScheduleController = function () {
             return request;
         },
 
+        /*modify by yimeng*/
         getRequiredFragmentCount = function(callback) {
             var self =this,
                 rules = self.scheduleRulesCollection.getRules(MediaPlayer.rules.ScheduleRulesCollection.prototype.FRAGMENTS_TO_SCHEDULE_RULES);
 
+	    for(var i=0; i<rules.length;i++){
+		if(typeof rules[i].setGreedyBufferingStart != "undefined"){
+		    rules[i].setGreedyBufferingStart(enableLongFragment);
+		    rules[i].setGreedyBufferingLength(pauseTime);
+		}
+	    }
             self.rulesController.applyRules(rules, self.streamProcessor, callback, fragmentsToLoad, function(currentValue, newValue) {
                 currentValue = currentValue === MediaPlayer.rules.SwitchRequest.prototype.NO_CHANGE ? 0 : currentValue;
-
-		if(!enableLongFragment)
-		{
-                    return Math.max(currentValue, newValue);
-		}
-		else{
-		    return 2000;
-		}
+		
+		return Math.max(currentValue, newValue);		
             });
         },
+        /*modify by yimeng end*/
 
         replaceCanceledPendingRequests = function(canceledRequests) {
             var ln = canceledRequests.length,
@@ -440,9 +442,15 @@ MediaPlayer.dependencies.ScheduleController = function () {
             return fragmentsToLoad;
         },
 
+	/*modify by yimeng*/
+	setPauseTime:function(pause_time){
+	    pauseTime = pause_time;
+	},
+	
 	setLongFragment:function(enabled){
 	    enableLongFragment = enabled;
 	},
+	/*modify by yimeng end*/
 
         reset: function() {
             var self = this;

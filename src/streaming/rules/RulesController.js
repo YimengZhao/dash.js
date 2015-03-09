@@ -112,7 +112,7 @@ MediaPlayer.rules.RulesController = function () {
                 rule,
                 i,
 
-                callbackFunc = function(result) {
+            callbackFunc = function(result) {
                     var value,
                         confidence;
 

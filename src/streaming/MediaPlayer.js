@@ -410,6 +410,15 @@ MediaPlayer = function (context) {
             abrController.setAutoSwitchBitrate(value);
         },
 
+	/*modify by yimeng*/
+	setPauseTime: function(pause_time){
+	    var streams = streamController.getStreams();
+	    var processors = streams[0].getStreamProcessors();
+	    for(var i = 0; i < processors.length; i++){
+		var scheduleController = processors[i].scheduleController;
+		scheduleController.setPauseTime(pause_time);
+	    }
+	},
 
 	setGreedyBuffering: function(enabled){
 	    var streams = streamController.getStreams();
@@ -418,8 +427,9 @@ MediaPlayer = function (context) {
 		var scheduleController = processors[i].scheduleController;
 		scheduleController.setLongFragment(enabled);
 	    }
-
 	},
+	/*modify by yimeng end*/
+
         /**
          * @param newRulesCollection
          * @memberof MediaPlayer#

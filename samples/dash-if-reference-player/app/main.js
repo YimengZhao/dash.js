@@ -526,14 +526,7 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
     //
     ////////////////////////////////////////
 
-    var ws;
-    ws = new WebSocket("ws://143.215.131.76:8888/ws");
-    ws.onmessage = function(evt) {alert("message received: " + evt.data)};
- 
-    ws.onclose = function(evt) { alert("Connection close"); };
-    ws.onopen = function(evt) {alert("open");};
-
-
+   
     video = document.querySelector(".dash-video-player video");
     context = new Dash.di.DashContext();
     player = new MediaPlayer(context);
@@ -554,6 +547,27 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
     //
     ////////////////////////////////////////
    
+    /*modify by yimeng*/
+    var ws;
+    ws = new WebSocket("ws://143.215.131.76:8888/ws");
+    ws.onmessage = function(evt) {
+	//alert("message received: " + evt.data);
+	var obj = JSON.parse(evt.data)
+	if(obj.action == "pause"){
+	    var pause_time = obj.pause_time;
+	    var pause_duration = obj.pause_duration;
+	    player.setGreedyBuffering(true);
+	    player.setPauseTime(parseFloat(pause_duration));
+	}
+	else if(obj.action == "resume"){
+	    player.setPauseTime(0);
+	    player.setGreedyBuffering(false);
+	}
+    };
+ 
+    ws.onclose = function(evt) { alert("Connection close"); };
+    ws.onopen = function(evt) {alert("open");};
+
 
     $scope.abrEnabled = true;
     $scope.greedyBuffering = false;
@@ -567,6 +581,7 @@ app.controller('DashController', function($scope, Sources, Notes, Contributors, 
 	$scope.greedyBuffering = enabled;
 	player.setGreedyBuffering(enabled);
     }
+    /*modify by yimeng end*/
 
     $scope.abrUp = function (type) {
         var newQuality,
